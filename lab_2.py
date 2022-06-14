@@ -30,4 +30,5 @@ def main():
 def perform_division(a: Any, b: Any) -> float:
     return int(a) / int(b)
 
+
 main()
