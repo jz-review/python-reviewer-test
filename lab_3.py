@@ -1,6 +1,8 @@
 import datetime
-import subprocess
+import shlex
+import subprocess  # nosemgrep: gitlab.bandit.B404
 import sys
+from ast import arg
 
 import boto3
 
@@ -15,23 +17,24 @@ def main(argv):
 
 
 def kickoff_subprocess(cmd, log_file_name):
-    process = subprocess.call(cmd, shell=True)
-    file = open(log_file_name, "a+")
+    safe_cmd = shlex.quote(cmd)
+    process = subprocess.call(safe_cmd, shell=False)
     timestamp = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-    output = (
-        timestamp
-        + " Command: "
-        + cmd[0]
-        + " | Return Code: "
-        + str(process)
-        + "\n"
-    )
-    file.write(output)
+    with open(log_file_name, "a+") as file:
+        output = (
+            timestamp
+            + " Command: "
+            + safe_cmd[0]
+            + " | Return Code: "
+            + str(process)
+            + "\n"
+        )
+        file.write(output)
 
 
 def upload_output_to_S3(log_file_name):
-    f = open(log_file_name, "rb")
-    s3.upload_fileobj(f, "<FMI1>", log_file_name)
+    with open(log_file_name, "rb") as f:
+        s3.upload_fileobj(f, "<FMI1>", log_file_name)
 
 
 if __name__ == "__main__":
