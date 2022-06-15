@@ -15,7 +15,7 @@ sast.files:
 	jq -r '.vulnerabilities[].location.file' $(GL_SAST_REPORT) \
 		| sort -u
 
-sast.report:
+sast.report: sast.scan
 	jq -r '.vulnerabilities[] | .identifiers[0].value, .identifiers[0].url, .location.file, .location.start_line, .severity, .message' $(GL_SAST_REPORT)
 
 sast.rules:
@@ -70,3 +70,6 @@ sast.filter:
 
 clean:
 	rm -f $(GL_SAST_REPORT)
+
+pre:
+	pre-commit run
