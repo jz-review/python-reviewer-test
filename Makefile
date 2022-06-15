@@ -70,3 +70,6 @@ sast.filter:
 
 clean:
 	rm -f $(GL_SAST_REPORT)
+
+pre:
+	pre-commit run
